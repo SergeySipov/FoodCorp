@@ -10,6 +10,16 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Sergey_Sipov"
       }
+    },
+    "Stage": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:6000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Stage"
+      }
     }
   }
 }

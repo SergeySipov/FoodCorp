@@ -15,7 +15,7 @@ namespace FoodCorp.DataAccess.EntityConfiguration
 
             builder.Property(u => u.Path)
                 .IsRequired()
-                .HasMaxLength(4096);
+                .HasMaxLength(1024);
 
             builder.HasOne(u => u.User)
                 .WithMany(u => u.ShowcaseImages)

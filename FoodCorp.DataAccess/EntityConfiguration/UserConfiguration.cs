@@ -2,6 +2,7 @@
 using FoodCorp.DataAccess.Constants;
 using FoodCorp.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FoodCorp.DataAccess.EntityConfiguration
@@ -33,17 +34,22 @@ namespace FoodCorp.DataAccess.EntityConfiguration
                 .HasMaxLength(256);
 
             builder.Property(u => u.ProfileImagePath)
-                .HasMaxLength(4096);
+                .HasMaxLength(1024);
             
             builder.Property(u => u.RegistrationDateTimeUtc)
                 .IsRequired()
                 .HasColumnType(SqlDbType.SmallDateTime.ToString())
-                .HasDefaultValue(DateTime.UtcNow);
+                .HasDefaultValueSql(SqlServerFunctionConstants.GetUtcDate);
 
             builder.HasMany(u => u.ShowcaseImages)
                 .WithOne(s => s.User)
                 .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne<Role>()
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.Role)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Property(u => u.Role)
                 .HasColumnName(RoleIdColumnName);
