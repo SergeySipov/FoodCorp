@@ -2,18 +2,17 @@
 using FoodCorp.DataAccess.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace FoodCorp.API.StartupExtensions.DataAccessLayer
+namespace FoodCorp.API.StartupExtensions.DataAccessLayer;
+
+public static class DatabaseServicesConfigurationExtension
 {
-    public static class DatabaseServicesConfigurationExtension
+    public static void AddDatabaseContextConfiguration(this IServiceCollection services,
+        IConfiguration configuration)
     {
-        public static void AddDatabaseContextConfiguration(this IServiceCollection services,
-            IConfiguration configuration)
+        var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
+        services.AddDbContext<FoodCorpDbContext>(options =>
         {
-            var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
-            services.AddDbContext<FoodCorpDbContext>(options =>
-            {
-                options.UseSqlServer(connectionString);
-            });
-        }
+            options.UseSqlServer(connectionString);
+        });
     }
 }

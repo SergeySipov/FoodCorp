@@ -1,8 +1,7 @@
-﻿namespace FoodCorp.Common.Models
+﻿namespace FoodCorp.Common.Models;
+
+public class EnumModel
 {
-    public class EnumModel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
 }

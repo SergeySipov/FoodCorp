@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -8,19 +7,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FoodCorp.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddProductTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "ref");
-
-            migrationBuilder.EnsureSchema(
-                name: "dbo");
+                name: "product");
 
             migrationBuilder.CreateTable(
-                name: "Role",
+                name: "Category",
                 schema: "ref",
                 columns: table => new
                 {
@@ -29,96 +25,93 @@ namespace FoodCorp.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Role", x => x.Id);
+                    table.PrimaryKey("PK_Category", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
-                schema: "dbo",
+                name: "Product",
+                schema: "product",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    NickName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    RegistrationDateTimeUtc = table.Column<DateTime>(type: "SmallDateTime", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    ProfileImagePath = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "Decimal(9,0)", precision: 9, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Product", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_Role_RoleId",
-                        column: x => x.RoleId,
+                        name: "FK_Product_Category_CategoryId",
+                        column: x => x.CategoryId,
                         principalSchema: "ref",
-                        principalTable: "Role",
+                        principalTable: "Category",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserShowcaseImage",
-                schema: "dbo",
+                name: "ProductImage",
+                schema: "product",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserShowcaseImage", x => x.Id);
+                    table.PrimaryKey("PK_ProductImage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserShowcaseImage_User_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "dbo",
-                        principalTable: "User",
+                        name: "FK_ProductImage_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "product",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 schema: "ref",
-                table: "Role",
+                table: "Category",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Legal Entity" },
-                    { 2, "Natural Person" },
-                    { 3, "Individual Enterpreneur" },
-                    { 4, "Moderator" },
-                    { 5, "Admin" }
+                    { 1, "Sushi" },
+                    { 2, "FastFood" },
+                    { 3, "Shawarma" },
+                    { 4, "Healthy" },
+                    { 5, "Breakfasts" }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_RoleId",
-                schema: "dbo",
-                table: "User",
-                column: "RoleId");
+                name: "IX_Product_CategoryId",
+                schema: "product",
+                table: "Product",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserShowcaseImage_UserId",
-                schema: "dbo",
-                table: "UserShowcaseImage",
-                column: "UserId");
+                name: "IX_ProductImage_ProductId",
+                schema: "product",
+                table: "ProductImage",
+                column: "ProductId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "UserShowcaseImage",
-                schema: "dbo");
+                name: "ProductImage",
+                schema: "product");
 
             migrationBuilder.DropTable(
-                name: "User",
-                schema: "dbo");
+                name: "Product",
+                schema: "product");
 
             migrationBuilder.DropTable(
-                name: "Role",
+                name: "Category",
                 schema: "ref");
         }
     }

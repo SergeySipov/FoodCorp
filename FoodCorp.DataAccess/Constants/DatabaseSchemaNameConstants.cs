@@ -1,8 +1,8 @@
-﻿namespace FoodCorp.DataAccess.Constants
+﻿namespace FoodCorp.DataAccess.Constants;
+
+public static class DatabaseSchemaNameConstants
 {
-    public static class DatabaseSchemaNameConstants
-    {
-        public const string Dbo = "dbo";
-        public const string Ref = "ref";
-    }
+    public const string Dbo = "dbo";
+    public const string Ref = "ref";
+    public const string Product = "product";
 }
