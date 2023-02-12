@@ -8,4 +8,10 @@ public static class DatabaseTableNameConstants
     public const string Category = nameof(Category);
     public const string ProductImage = nameof(ProductImage);
     public const string Product = nameof(Product);
+    public const string Performer = nameof(Performer);
+    public const string Customer = nameof(Customer);
+    public const string CustomerProduct = nameof(CustomerProduct);
+    public const string PerformerProduct = nameof(PerformerProduct);
+    public const string Order = nameof(Order);
+    public const string OrderStatus = nameof(OrderStatus);
 }

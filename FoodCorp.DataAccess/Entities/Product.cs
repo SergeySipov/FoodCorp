@@ -9,4 +9,7 @@ public class Product
     public string Description { get; set; }
 
     public ICollection<ProductImage> Images { get; set; }
+    public ICollection<CustomerProduct> CustomerProducts { get; set; }
+    public ICollection<PerformerProduct> PerformerProducts { get; set; }
+    public ICollection<Order> Orders { get; set; }
 }

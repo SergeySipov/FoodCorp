@@ -4,6 +4,7 @@ using FoodCorp.DataAccess.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodCorp.DataAccess.Migrations
 {
     [DbContext(typeof(FoodCorpDbContext))]
-    partial class FoodCorpDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230212192827_AddCustomerAndPerformerProducts")]
+    partial class AddCustomerAndPerformerProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,97 +94,6 @@ namespace FoodCorp.DataAccess.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("CustomerProduct", "product");
-                });
-
-            modelBuilder.Entity("FoodCorp.DataAccess.Entities.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDateTimeUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("SmallDateTime")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ExpirationDateTimeUtc")
-                        .HasColumnType("SmallDateTime");
-
-                    b.Property<decimal>("PreferredPrice")
-                        .HasPrecision(9)
-                        .HasColumnType("Decimal");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnName("OrderStatusId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("Order", "order");
-                });
-
-            modelBuilder.Entity("FoodCorp.DataAccess.Entities.OrderStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(48)
-                        .HasColumnType("nvarchar(48)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrderStatus", "ref");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Performer Found"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Performer Selected"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "In Progress"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Ready For Delivery"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Completed"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Canceled"
-                        });
                 });
 
             modelBuilder.Entity("FoodCorp.DataAccess.Entities.Performer", b =>
@@ -415,31 +327,6 @@ namespace FoodCorp.DataAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("FoodCorp.DataAccess.Entities.Order", b =>
-                {
-                    b.HasOne("FoodCorp.DataAccess.Entities.Customer", "Customer")
-                        .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FoodCorp.DataAccess.Entities.Product", "Product")
-                        .WithMany("Orders")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FoodCorp.DataAccess.Entities.OrderStatus", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("Status")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("FoodCorp.DataAccess.Entities.Performer", b =>
                 {
                     b.HasOne("FoodCorp.DataAccess.Entities.User", "User")
@@ -517,14 +404,7 @@ namespace FoodCorp.DataAccess.Migrations
 
             modelBuilder.Entity("FoodCorp.DataAccess.Entities.Customer", b =>
                 {
-                    b.Navigation("Orders");
-
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("FoodCorp.DataAccess.Entities.OrderStatus", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("FoodCorp.DataAccess.Entities.Performer", b =>
@@ -537,8 +417,6 @@ namespace FoodCorp.DataAccess.Migrations
                     b.Navigation("CustomerProducts");
 
                     b.Navigation("Images");
-
-                    b.Navigation("Orders");
 
                     b.Navigation("PerformerProducts");
                 });

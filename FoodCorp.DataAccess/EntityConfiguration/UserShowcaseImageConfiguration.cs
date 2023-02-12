@@ -9,7 +9,7 @@ public class UserShowcaseImageConfiguration : IEntityTypeConfiguration<UserShowc
 {
     public void Configure(EntityTypeBuilder<UserShowcaseImage> builder)
     {
-        builder.ToTable(DatabaseTableNameConstants.UserShowcaseImage, DatabaseSchemaNameConstants.Dbo);
+        builder.ToTable(DatabaseTableNameConstants.UserShowcaseImage, DatabaseSchemaNameConstants.User);
 
         builder.HasKey(u => u.Id);
 

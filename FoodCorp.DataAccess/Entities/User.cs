@@ -12,4 +12,6 @@ public class User
     public Enums.Role Role { get; set; }
 
     public ICollection<UserShowcaseImage> ShowcaseImages { get; set; }
+    public Customer Customer { get; set; }
+    public Performer Performer { get; set; }
 }
