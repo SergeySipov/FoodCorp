@@ -14,4 +14,10 @@ public static class DatabaseTableNameConstants
     public const string PerformerProduct = nameof(PerformerProduct);
     public const string Order = nameof(Order);
     public const string OrderStatus = nameof(OrderStatus);
+    public const string OrderFeedback = nameof(OrderFeedback);
+    public const string DeliveryMethod = nameof(DeliveryMethod);
+    public const string PaymentMethod = nameof(PaymentMethod);
+    public const string OrderOffer = nameof(OrderOffer);
+    public const string OrderOfferChatMessage = nameof(OrderOfferChatMessage);
+    public const string OrderDeliveryAndPaymentType = nameof(OrderDeliveryAndPaymentType);
 }

@@ -16,6 +16,12 @@ public class FoodCorpDbContext : DbContext
     public DbSet<PerformerProduct> PerformerProducts { get; set; }
     public DbSet<OrderStatus> OrderStatuses { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderFeedback> OrderFeedbacks { get; set; }
+    public DbSet<DeliveryMethod> DeliveryMethods { get; set; }
+    public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    public DbSet<OrderOffer> OrderOffers { get; set; }
+    public DbSet<OrderOfferChatMessage> OrderOfferChatMessages { get; set; }
+    public DbSet<OrderDeliveryAndPaymentType> OrderDeliveryAndPaymentTypes { get; set; }
 
     public FoodCorpDbContext(DbContextOptions options) : base(options)
     {

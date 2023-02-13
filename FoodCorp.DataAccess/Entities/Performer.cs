@@ -9,4 +9,5 @@ public class Performer
     public int CountOfCompletedOrders { get; set; }
 
     public ICollection<PerformerProduct> Products { get; set; }
+    public ICollection<OrderOffer> Offers { get; set; }
 }

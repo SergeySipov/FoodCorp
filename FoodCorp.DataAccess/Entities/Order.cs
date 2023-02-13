@@ -15,4 +15,6 @@ public class Order
     public int CustomerId { get; set; }
     public Customer Customer { get; set; }
 
+    public OrderFeedback OrderFeedback { get; set; }
+    public ICollection<OrderOffer> Offers { get; set; }
 }
