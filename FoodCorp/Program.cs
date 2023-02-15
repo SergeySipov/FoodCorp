@@ -1,4 +1,4 @@
-using FoodCorp.API.StartupExtensions.DataAccessLayer;
+using FoodCorp.API.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -9,7 +9,10 @@ var configuration = builder.Configuration;
 services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
+
+services.AddConfigurationProvider();
 services.AddDatabaseContextConfiguration(configuration);
+services.AddDataAccessAbstractions();
 
 var app = builder.Build();
 

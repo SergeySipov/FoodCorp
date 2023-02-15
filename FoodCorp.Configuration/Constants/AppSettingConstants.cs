@@ -1,4 +1,4 @@
-﻿namespace FoodCorp.API.Constants;
+﻿namespace FoodCorp.Configuration.Constants;
 
 public static class AppSettingConstants
 {

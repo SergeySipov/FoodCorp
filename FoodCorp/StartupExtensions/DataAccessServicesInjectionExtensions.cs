@@ -1,10 +1,11 @@
-﻿using FoodCorp.API.Constants;
+﻿using FoodCorp.Configuration.Constants;
 using FoodCorp.DataAccess.DatabaseContext;
+using FoodCorp.DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
-namespace FoodCorp.API.StartupExtensions.DataAccessLayer;
+namespace FoodCorp.API.StartupExtensions;
 
-public static class DatabaseServicesConfigurationExtension
+public static class DataAccessServicesInjectionExtensions
 {
     public static void AddDatabaseContextConfiguration(this IServiceCollection services,
         IConfiguration configuration)
@@ -14,5 +15,10 @@ public static class DatabaseServicesConfigurationExtension
         {
             options.UseSqlServer(connectionString);
         });
+    }
+
+    public static void AddDataAccessAbstractions(this IServiceCollection services)
+    {
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }
