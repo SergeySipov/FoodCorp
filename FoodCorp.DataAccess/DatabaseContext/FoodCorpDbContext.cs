@@ -26,12 +26,7 @@ public class FoodCorpDbContext : DbContext
     public FoodCorpDbContext(DbContextOptions options) : base(options)
     {
     }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.LogTo(Console.WriteLine);
-    }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
