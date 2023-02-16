@@ -7,7 +7,7 @@ namespace FoodCorp.API.StartupExtensions;
 
 public static class DataAccessServicesInjectionExtensions
 {
-    public static void AddDatabaseContextConfiguration(this IServiceCollection services,
+    public static void AddDatabaseContext(this IServiceCollection services,
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
