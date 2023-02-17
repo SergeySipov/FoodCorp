@@ -12,7 +12,7 @@ public class ErrorHandlerMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
-    public ErrorHandlerMiddleware(RequestDelegate next, 
+    public ErrorHandlerMiddleware(RequestDelegate next,
         ILogger<ErrorHandlerMiddleware> logger)
     {
         _next = next;
@@ -40,13 +40,13 @@ public class ErrorHandlerMiddleware
         var (statusCode, error) = GetStatusCodeAndError(exception);
         response.ContentType = MediaTypeNames.Application.Json;
         response.StatusCode = statusCode;
-        var message = exception.GetBaseException().Message;
 
         var errorDetailsViewModel = new ErrorDetailsViewModel
         {
             StatusCode = statusCode,
             Error = error,
-            Message = message
+            Message = exception.GetBaseException().Message,
+            StackTrace = exception.GetBaseException().StackTrace!
         };
 
         return context.Response.WriteAsJsonAsync(errorDetailsViewModel);
