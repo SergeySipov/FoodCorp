@@ -1,5 +1,6 @@
 ﻿using FoodCorp.Configuration.Constants;
 using FoodCorp.DataAccess.DatabaseContext;
+using FoodCorp.DataAccess.Seeds;
 using FoodCorp.DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,5 +21,10 @@ public static class DataAccessServicesInjectionExtensions
     public static void AddDataAccessAbstractions(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+    }
+
+    public static void AddDemoDataSeed(this IServiceCollection services)
+    {
+        services.AddScoped<DemoDataGenerator>();
     }
 }
