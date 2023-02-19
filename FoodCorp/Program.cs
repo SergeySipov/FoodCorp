@@ -36,6 +36,8 @@ try
     services.AddDatabaseContext(configuration);
     services.AddDataAccessAbstractions();
     services.AddDemoDataSeed();//temp solution
+    services.AddMapster();
+    services.AddBusinessLogicServices();
 
     builder.ReplaceLoggingProviderWithNlog();
 

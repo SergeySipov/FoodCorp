@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FoodCorp.BusinessLogic.Services.Product;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodCorp.API.Controllers;
@@ -7,10 +8,20 @@ namespace FoodCorp.API.Controllers;
 [ApiController]
 public class TestController : ControllerBase
 {
-    [AllowAnonymous]
-    [HttpPost]
-    public IActionResult Test()
+    private readonly IProductService _productService;
+
+    public TestController(IProductService productService)
     {
-        return Ok("everything works!");
+        _productService = productService;
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> Test()
+    {
+        var result = await _productService.GetAllProductsAsync();
+        var b = _productService.GetProductByIdAsync(3016);
+
+        return Ok(result);
     }
 }
