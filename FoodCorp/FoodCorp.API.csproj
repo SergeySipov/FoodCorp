@@ -19,6 +19,5 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\FoodCorp.BusinessLogic\FoodCorp.BusinessLogic.csproj" />
-		<ProjectReference Include="..\FoodCorp.Configuration\FoodCorp.Configuration.csproj" />
 	</ItemGroup>
 </Project>
