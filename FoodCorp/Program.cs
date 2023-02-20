@@ -3,9 +3,14 @@ using FoodCorp.API.Middleware;
 using FoodCorp.API.StartupExtensions;
 using FoodCorp.Configuration.Constants;
 using FoodCorp.DataAccess.Seeds;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Web;
+using System.Net.Mime;
+using Newtonsoft.Json;
 
 var logger = NLogBuilder.ConfigureNLog(AppSettingConstants.LoggerConfigurationFileName).GetCurrentClassLogger();
 try
@@ -21,7 +26,6 @@ try
     // Add services to the container.
     services.AddControllers();
     services.AddEndpointsApiExplorer();
-
     services.AddSwaggerGen(options =>
     {
         options.SwaggerDoc(appVersion,
@@ -31,11 +35,16 @@ try
                 Version = appVersion
             });
     });
-
     services.AddConfigurationProvider();
     services.AddDatabaseContext(configuration);
     services.AddDataAccessAbstractions();
     services.AddDemoDataSeed();//temp solution
+    services.AddMapster();
+    services.AddBusinessLogicServices();
+
+    var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
+    services.AddHealthChecks()
+        .AddSqlServer(connectionString!);
 
     builder.ReplaceLoggingProviderWithNlog();
 
@@ -59,13 +68,32 @@ try
     app.UseAuthorization();
     app.MapControllers();
 
-    app.MapGet("/AddDemoRecordsToDb", async (DemoDataGenerator generator) => //temp solution
+    if (!webHostEnvironment.IsProduction())
     {
-        await generator.ClearAllAsync();
-        await generator.GenerateAsync();
-    });
+        app.MapGet(AppSettingConstants.GenerateDemoDataMap, async (DemoDataGenerator generator) => //temp solution
+        {
+            await generator.ClearAllAsync();
+            await generator.GenerateAsync();
+        });
+    }
+
+    app.MapHealthChecks(AppSettingConstants.HealthCheckMap, new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
 
     app.Run();
+
+    static Task WriteHealthCheckResponse(HttpContext httpContext, HealthReport result)
+    {
+        httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+        var json = new JObject(
+            new JProperty("status", result.Status.ToString()),
+            new JProperty("results", new JObject(result.Entries.Select(pair =>
+                new JProperty(pair.Key, new JObject(
+                    new JProperty("status", pair.Value.Status.ToString()),
+                    new JProperty("description", pair.Value.Description),
+                    new JProperty("data", new JObject(pair.Value.Data.Select(
+                        p => new JProperty(p.Key, p.Value))))))))));
+        return httpContext.Response.WriteAsync(json.ToString(Formatting.Indented));
+    }
 }
 catch(Exception exception)
 {

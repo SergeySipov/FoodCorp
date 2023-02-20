@@ -1,9 +1,36 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FoodCorp.DataAccess\FoodCorp.DataAccess.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Mappers\ProductMapper\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Generated Include="**/*.g.cs" />
+		<!--to clean up generated files dotnet msbuild -t:CleanGenerated-->
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+	</ItemGroup>
+
+	<Target Name="CleanGenerated" BeforeTargets="AfterBuild">
+		<Delete Files="@(Generated)" />
+	</Target>
+	<Target Name="Mapster" AfterTargets="build">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+		<!--<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster model -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster extension -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />-->
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster mapper -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+	</Target>
 
 </Project>
