@@ -1,4 +1,5 @@
-﻿using FoodCorp.BusinessLogic.Models;
+﻿using FoodCorp.BusinessLogic.Mappers.ProductMapper;
+using FoodCorp.BusinessLogic.Models;
 using FoodCorp.DataAccess.Repositories.ProductRepository;
 using FoodCorp.DataAccess.UnitOfWork;
 using Mapster;
@@ -11,28 +12,25 @@ public class ProductService : IProductService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IProductRepository _productRepository;
+    private readonly IProductMapper _productMapper;
 
     public ProductService(IUnitOfWork unitOfWork, 
         IMapper mapper, 
-        IProductRepository productRepository)
+        IProductRepository productRepository, 
+        IProductMapper productMapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _productRepository = productRepository;
+        _productMapper = productMapper;
     }
 
     public async Task<List<ProductModel>> GetAllProductsAsync()
     {
-        var productDataModels = _productRepository.GetAllProductsAsync();
-
-        var productModels = new List<ProductModel>();
-        await foreach (var productDataModel in productDataModels)
-        {
-            var productModel = productDataModel.Adapt<ProductModel>();
-            productModels.Add(productModel);
-        }//попробовать вместо этой хуйни tolist и List<UserDto> destinationList = sourceList.Adapt<List<UserDto>>();
-
-        return productModels;
+        var productDataModels = await _productRepository.GetAllProductsAsync().ToListAsync();
+        var productModels = _productMapper.MapTo(productDataModels);
+        
+        return productModels.ToList();
     }
 
     public async Task<ProductModel> GetProductByIdAsync(int productId)

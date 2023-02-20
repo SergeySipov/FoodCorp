@@ -9,4 +9,5 @@ public interface IProductMapper
 {
     ProductModel MapTo(ProductDataModel productDataModel);
     ProductModel MapTo(ProductDataModel product, ProductModel productModel);
+    IEnumerable<ProductModel> MapTo(IEnumerable<ProductDataModel> productDataModels);
 }
