@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Web;
 using System.Net.Mime;
-using Formatting = Newtonsoft.Json.Formatting;
+using Newtonsoft.Json;
 
 var logger = NLogBuilder.ConfigureNLog(AppSettingConstants.LoggerConfigurationFileName).GetCurrentClassLogger();
 try
@@ -44,7 +44,7 @@ try
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()
-        .AddSqlServer(connectionString);
+        .AddSqlServer(connectionString!);
 
     builder.ReplaceLoggingProviderWithNlog();
 
