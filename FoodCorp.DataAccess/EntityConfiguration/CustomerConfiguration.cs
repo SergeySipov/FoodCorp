@@ -22,5 +22,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsRequired()
             .HasColumnType(SqlDbType.Float.ToString())
             .HasPrecision(2);
+
+        builder.HasMany(c => c.Products)
+            .WithMany(p => p.Customers)
+            .UsingEntity<CustomerProduct>();
     }
 }

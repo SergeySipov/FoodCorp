@@ -12,9 +12,5 @@ public class PerformerProductConfiguration : IEntityTypeConfiguration<PerformerP
         builder.ToTable(DatabaseTableNameConstants.PerformerProduct, DatabaseSchemaNameConstants.Product);
 
         builder.HasKey(pp => new { pp.PerformerId, pp.ProductId });
-
-        builder.HasOne(pp => pp.Performer)
-            .WithMany(p => p.Products)
-            .HasForeignKey(cp => cp.PerformerId);
     }
 }

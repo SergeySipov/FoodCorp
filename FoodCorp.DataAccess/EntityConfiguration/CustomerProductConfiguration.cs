@@ -12,9 +12,5 @@ public class CustomerProductConfiguration : IEntityTypeConfiguration<CustomerPro
         builder.ToTable(DatabaseTableNameConstants.CustomerProduct, DatabaseSchemaNameConstants.Product);
 
         builder.HasKey(cp => new { cp.CustomerId, cp.ProductId });
-
-        builder.HasOne(cp => cp.Customer)
-            .WithMany(c => c.Products)
-            .HasForeignKey(cp => cp.CustomerId);
     }
 }

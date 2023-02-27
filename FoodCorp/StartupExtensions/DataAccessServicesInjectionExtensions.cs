@@ -16,6 +16,8 @@ public static class DataAccessServicesInjectionExtensions
         services.AddDbContext<FoodCorpDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
+            options.UseCamelCaseNamingConvention();
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
     }
 

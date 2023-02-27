@@ -8,6 +8,6 @@ public class Performer
     public double Rating { get; set; }
     public int CountOfCompletedOrders { get; set; }
 
-    public ICollection<PerformerProduct> Products { get; set; }
+    public ICollection<Product> Products { get; set; }
     public ICollection<OrderOffer> Offers { get; set; }
 }

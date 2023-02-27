@@ -7,6 +7,6 @@ public class Customer
 
     public double Rating { get; set; }
 
-    public ICollection<CustomerProduct> Products { get; set; }
+    public ICollection<Product> Products { get; set; }
     public ICollection<Order> Orders { get; set; }
 }

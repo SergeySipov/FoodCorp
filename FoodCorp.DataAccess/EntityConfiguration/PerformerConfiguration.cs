@@ -25,5 +25,9 @@ public class PerformerConfiguration : IEntityTypeConfiguration<Performer>
             .IsRequired()
             .HasColumnType(SqlDbType.Float.ToString())
             .HasPrecision(2);
+
+        builder.HasMany(c => c.Products)
+            .WithMany(p => p.Performers)
+            .UsingEntity<PerformerProduct>();
     }
 }
