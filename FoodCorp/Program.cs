@@ -5,7 +5,6 @@ using FoodCorp.Configuration.Constants;
 using FoodCorp.DataAccess.Seeds;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Web;
@@ -24,27 +23,23 @@ try
     var appVersion = ApplicationHelper.GetApplicationVersion();
 
     // Add services to the container.
+    var appSettings = services.AddAppSettingsModels(configuration);
     services.AddControllers();
     services.AddEndpointsApiExplorer();
-    services.AddSwaggerGen(options =>
-    {
-        options.SwaggerDoc(appVersion,
-            new OpenApiInfo
-            {
-                Title = AppSettingConstants.ProjectName,
-                Version = appVersion
-            });
-    });
+    services.AddSwagger(appVersion);
     services.AddConfigurationProvider();
-    services.AddDatabaseContext(configuration);
+    services.AddDatabaseContext(configuration, appSettings.SecuritySettings);
     services.AddDataAccessAbstractions();
     services.AddDemoDataSeed();//temp solution
     services.AddMapster();
     services.AddBusinessLogicServices();
+    services.AddAuthenticationAndAuthorization(appSettings.JwtSettings);
+    services.AddPresentationLayerServices();
+    services.AddFluentValidation();
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()
-        .AddSqlServer(connectionString!);
+            .AddSqlServer(connectionString!);
 
     builder.ReplaceLoggingProviderWithNlog();
 
@@ -65,6 +60,8 @@ try
     
     app.UseMiddleware<ErrorHandlerMiddleware>();
     app.UseHttpsRedirection();
+    app.UseRouting();
+    app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
 

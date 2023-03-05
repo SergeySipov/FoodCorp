@@ -20,4 +20,7 @@ public static class DatabaseTableNameConstants
     public const string OrderOffer = nameof(OrderOffer);
     public const string OrderOfferChatMessage = nameof(OrderOfferChatMessage);
     public const string OrderDeliveryAndPaymentType = nameof(OrderDeliveryAndPaymentType);
+    public const string UserClaim = nameof(UserClaim);
+    public const string UserLogin = nameof(UserLogin);
+    public const string UserToken = nameof(UserToken);
 }

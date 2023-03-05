@@ -1,7 +1,10 @@
 ﻿using Mapster;
 using MapsterMapper;
 using System.Reflection;
+using FoodCorp.BusinessLogic.Mappers.AccountMapper;
 using FoodCorp.BusinessLogic.Mappers.ProductMapper;
+using FoodCorp.BusinessLogic.Services.Account;
+using FoodCorp.BusinessLogic.Services.JwtToken;
 using FoodCorp.BusinessLogic.Services.Product;
 
 namespace FoodCorp.API.StartupExtensions;
@@ -26,7 +29,10 @@ public static class BusinessLogicServicesInjectionExtensions
     public static void AddBusinessLogicServices(this IServiceCollection services)
     {
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddSingleton<IJwtTokenGenerationService, JwtTokenGenerationService>();
 
         services.AddSingleton<IProductMapper, ProductMapper>();
+        services.AddSingleton<IAccountMapper, AccountMapper>();
     }
 }
