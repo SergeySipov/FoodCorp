@@ -1,8 +1,7 @@
 ﻿namespace FoodCorp.BusinessLogic.Models.Account;
 
-public class LoginModel
-{
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public bool IsPersistent { get; set; }
-}
+public record LoginModel(
+    string Email,
+    string Password,
+    bool IsPersistent
+);

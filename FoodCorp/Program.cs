@@ -30,16 +30,26 @@ try
     services.AddConfigurationProvider();
     services.AddDatabaseContext(configuration, appSettings.SecuritySettings);
     services.AddDataAccessAbstractions();
-    services.AddDemoDataSeed();//temp solution
+    services.AddDemoDataSeed(); //temp solution
     services.AddMapster();
     services.AddBusinessLogicServices();
-    services.AddAuthenticationAndAuthorization(appSettings.JwtSettings);
+    services.AddAuthenticationAndAuthorization(appSettings);
     services.AddPresentationLayerServices();
     services.AddFluentValidation();
+    services.AddCors(options =>
+    {
+        options.AddPolicy(AppSettingConstants.CorsPolicyName, cfg =>
+        {
+            cfg.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+    });
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()
-            .AddSqlServer(connectionString!);
+        .AddSqlServer(connectionString!);
 
     builder.ReplaceLoggingProviderWithNlog();
 
@@ -49,7 +59,8 @@ try
     if (!webHostEnvironment.IsProduction())
     {
         var currentAppVersion = appVersion;
-        var swaggerEndpointWithCurrentVersion = string.Format(AppSettingConstants.SwaggerEndpointUrl, currentAppVersion);
+        var swaggerEndpointWithCurrentVersion =
+            string.Format(AppSettingConstants.SwaggerEndpointUrl, currentAppVersion);
 
         app.UseSwagger();
         app.UseSwaggerUI(option =>
@@ -57,10 +68,11 @@ try
             option.SwaggerEndpoint(swaggerEndpointWithCurrentVersion, AppSettingConstants.ProjectName);
         });
     }
-    
+
     app.UseMiddleware<ErrorHandlerMiddleware>();
     app.UseHttpsRedirection();
     app.UseRouting();
+    app.UseCors(AppSettingConstants.CorsPolicyName);
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
@@ -74,8 +86,9 @@ try
         });
     }
 
-    app.MapHealthChecks(AppSettingConstants.HealthCheckMap, new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
-
+    app.MapHealthChecks(AppSettingConstants.HealthCheckMap,
+        new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
+    
     app.Run();
 
     static Task WriteHealthCheckResponse(HttpContext httpContext, HealthReport result)
@@ -92,7 +105,7 @@ try
         return httpContext.Response.WriteAsync(json.ToString(Formatting.Indented));
     }
 }
-catch(Exception exception)
+catch (Exception exception)
 {
     logger.Error(exception, "Stopped program because of exception");
     throw;

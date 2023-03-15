@@ -2,10 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
 		<UserSecretsId>f54427f3-f218-469a-895c-c770fb6e7ea1</UserSecretsId>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,6 +22,7 @@
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.15" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.2.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>

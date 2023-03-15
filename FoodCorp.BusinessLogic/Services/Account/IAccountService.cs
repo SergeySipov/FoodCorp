@@ -6,4 +6,5 @@ public interface IAccountService
 {
     Task<string> LoginUserAsync(LoginModel loginModel);
     Task<string> RegisterAsync(RegistrationModel registrationModel);
+    Task<string> LoginOrRegisterWithGoogleAsync(GoogleLoginModel googleLoginModel);
 }

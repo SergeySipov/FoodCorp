@@ -8,23 +8,19 @@ namespace FoodCorp.API.Mappers.AccountMapper
     {
         public LoginModel MapTo(LoginViewModel p1)
         {
-            return p1 == null ? null : new LoginModel()
-            {
-                Email = p1.Email,
-                Password = p1.Password,
-                IsPersistent = p1.IsPersistent
-            };
+            return p1 == null ? null : new LoginModel(p1.Email, p1.Password, p1.IsPersistent);
         }
         public RegistrationModel MapTo(RegistrationViewModel p2)
         {
-            return p2 == null ? null : new RegistrationModel()
+            return p2 == null ? null : new RegistrationModel(p2.Name, p2.Surname, p2.UserName, p2.Email, p2.PhoneNumber, p2.Password, p2.ProfileImagePath);
+        }
+        public GoogleLoginModel MapTo(GoogleLoginViewModel p3)
+        {
+            return p3 == null ? null : new GoogleLoginModel()
             {
-                Name = p2.Name,
-                Surname = p2.Surname,
-                UserName = p2.UserName,
-                Email = p2.Email,
-                PhoneNumber = p2.PhoneNumber,
-                Password = p2.Password
+                IdToken = p3.IdToken,
+                IdentityProviderId = p3.IdentityProviderId,
+                ProviderKey = p3.ProviderKey
             };
         }
     }

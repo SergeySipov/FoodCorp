@@ -38,7 +38,7 @@ public static class DataAccessServicesInjectionExtensions
             })
             .AddEntityFrameworkStores<FoodCorpDbContext>()
             .AddDefaultTokenProviders();
-        
+
         services.Configure<PasswordHasherOptions>(option =>
         {
             option.IterationCount = securitySettings.PasswordHashIterationsCount;
