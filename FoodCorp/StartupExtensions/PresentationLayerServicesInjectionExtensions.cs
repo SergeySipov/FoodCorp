@@ -23,7 +23,6 @@ public static class PresentationLayerServicesInjectionExtensions
         AppSettingsCompositeModel appSettings)
     {
         var jwtSettings = appSettings.JwtSettings;
-        var googleAuthenticationSettings = appSettings.GoogleAuthenticationSettings;
 
         var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 
@@ -69,16 +68,25 @@ public static class PresentationLayerServicesInjectionExtensions
         var securitySettings = securitySettingsSection.Get<SecuritySettings>();
         services.Configure<SecuritySettings>(securitySettingsSection);
 
-        var googleAuthenticationSettingsSection =
-            configuration.GetSection(SettingsSectionNameConstants.GoogleAuthenticationSettings);
+        var googleAuthenticationSettingsSection = configuration.GetSection(SettingsSectionNameConstants.GoogleAuthenticationSettings);
         var googleAuthenticationSettings = googleAuthenticationSettingsSection.Get<GoogleAuthenticationSettings>();
         services.Configure<GoogleAuthenticationSettings>(googleAuthenticationSettingsSection);
+
+        var facebookAuthenticationSettingsSection = configuration.GetSection(SettingsSectionNameConstants.FacebookAuthenticationSettings);
+        var facebookAuthenticationSettings = facebookAuthenticationSettingsSection.Get<FacebookAuthenticationSettings>();
+        services.Configure<FacebookAuthenticationSettings>(facebookAuthenticationSettingsSection);
+
+        var smtpSettingsSection = configuration.GetSection(SettingsSectionNameConstants.SmtpSettings);
+        var smtpSettings = smtpSettingsSection.Get<SmtpSettings>();
+        services.Configure<SmtpSettings>(smtpSettingsSection);
 
         var compositeModel = new AppSettingsCompositeModel
         {
             JwtSettings = jwtSettings,
             SecuritySettings = securitySettings,
-            GoogleAuthenticationSettings = googleAuthenticationSettings
+            GoogleAuthenticationSettings = googleAuthenticationSettings,
+            FacebookAuthenticationSettings = facebookAuthenticationSettings,
+            SmtpSettings = smtpSettings
         };
 
         return compositeModel;

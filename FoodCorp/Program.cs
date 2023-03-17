@@ -46,6 +46,7 @@ try
                 .AllowCredentials();
         });
     });
+    services.AddHttpClient();
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()

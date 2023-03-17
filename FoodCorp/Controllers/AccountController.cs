@@ -18,7 +18,16 @@ public class AccountController : ApiBaseController
         _accountService = accountService;
         _accountMapper = accountMapper;
     }
-    
+
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<IActionResult> LoginWithFacebook([FromBody] string credential)
+    {
+        var jwtToken = await _accountService.LoginOrRegisterWithFacebookAsync(credential);
+
+        return Ok(jwtToken);
+    }
+
     [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> LoginWithGoogle(GoogleLoginViewModel loginViewModel)
