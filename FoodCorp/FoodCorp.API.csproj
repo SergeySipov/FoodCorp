@@ -2,10 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
 		<UserSecretsId>f54427f3-f218-469a-895c-c770fb6e7ea1</UserSecretsId>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 	</PropertyGroup>
 
 	<ItemGroup>

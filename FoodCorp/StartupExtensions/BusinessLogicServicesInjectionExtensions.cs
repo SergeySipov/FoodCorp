@@ -6,6 +6,7 @@ using FoodCorp.BusinessLogic.Mappers.ProductMapper;
 using FoodCorp.BusinessLogic.Services.Account;
 using FoodCorp.BusinessLogic.Services.JwtToken;
 using FoodCorp.BusinessLogic.Services.Product;
+using FoodCorp.BusinessLogic.Services.Email;
 
 namespace FoodCorp.API.StartupExtensions;
 
@@ -31,6 +32,7 @@ public static class BusinessLogicServicesInjectionExtensions
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddSingleton<IJwtTokenGenerationService, JwtTokenGenerationService>();
+        services.AddSingleton<IEmailSenderService, EmailSenderService>();
 
         services.AddSingleton<IProductMapper, ProductMapper>();
         services.AddSingleton<IAccountMapper, AccountMapper>();

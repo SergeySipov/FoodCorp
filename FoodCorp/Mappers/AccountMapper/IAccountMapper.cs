@@ -9,4 +9,5 @@ public interface IAccountMapper
 {
     LoginModel MapTo(LoginViewModel loginViewModel);
     RegistrationModel MapTo(RegistrationViewModel loginViewModel);
+    GoogleLoginModel MapTo(GoogleLoginViewModel loginViewModel);
 }

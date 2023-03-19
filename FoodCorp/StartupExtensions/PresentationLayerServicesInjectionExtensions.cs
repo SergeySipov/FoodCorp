@@ -18,15 +18,19 @@ public static class PresentationLayerServicesInjectionExtensions
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
     }
-    
-    public static void AddAuthenticationAndAuthorization(this IServiceCollection services, JwtSettings jwtSettings)
+
+    public static void AddAuthenticationAndAuthorization(this IServiceCollection services,
+        AppSettingsCompositeModel appSettings)
     {
+        var jwtSettings = appSettings.JwtSettings;
+
         var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
@@ -50,8 +54,9 @@ public static class PresentationLayerServicesInjectionExtensions
     {
         services.AddSingleton<IAccountMapper, AccountMapper>();
     }
-    
-    public static AppSettingsCompositeModel AddAppSettingsModels(this IServiceCollection services, IConfiguration configuration)
+
+    public static AppSettingsCompositeModel AddAppSettingsModels(this IServiceCollection services,
+        IConfiguration configuration)
     {
         (configuration as ConfigurationManager).AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
@@ -63,10 +68,25 @@ public static class PresentationLayerServicesInjectionExtensions
         var securitySettings = securitySettingsSection.Get<SecuritySettings>();
         services.Configure<SecuritySettings>(securitySettingsSection);
 
+        var googleAuthenticationSettingsSection = configuration.GetSection(SettingsSectionNameConstants.GoogleAuthenticationSettings);
+        var googleAuthenticationSettings = googleAuthenticationSettingsSection.Get<GoogleAuthenticationSettings>();
+        services.Configure<GoogleAuthenticationSettings>(googleAuthenticationSettingsSection);
+
+        var facebookAuthenticationSettingsSection = configuration.GetSection(SettingsSectionNameConstants.FacebookAuthenticationSettings);
+        var facebookAuthenticationSettings = facebookAuthenticationSettingsSection.Get<FacebookAuthenticationSettings>();
+        services.Configure<FacebookAuthenticationSettings>(facebookAuthenticationSettingsSection);
+
+        var smtpSettingsSection = configuration.GetSection(SettingsSectionNameConstants.SmtpSettings);
+        var smtpSettings = smtpSettingsSection.Get<SmtpSettings>();
+        services.Configure<SmtpSettings>(smtpSettingsSection);
+
         var compositeModel = new AppSettingsCompositeModel
         {
             JwtSettings = jwtSettings,
-            SecuritySettings = securitySettings
+            SecuritySettings = securitySettings,
+            GoogleAuthenticationSettings = googleAuthenticationSettings,
+            FacebookAuthenticationSettings = facebookAuthenticationSettings,
+            SmtpSettings = smtpSettings
         };
 
         return compositeModel;
