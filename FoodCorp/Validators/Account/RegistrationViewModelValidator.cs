@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using FluentValidation;
+﻿using FluentValidation;
 using FoodCorp.API.ViewModels.Account;
 using FoodCorp.Configuration.Model.AppSettings;
 using Microsoft.Extensions.Options;
@@ -24,11 +23,7 @@ public class RegistrationViewModelValidator : AbstractValidator<RegistrationView
             .WithMessage($"Password must contains minimum {securitySettings.Value.RequiredLength} symbols");
 
         RuleFor(r => r.PhoneNumber)
-            .NotEmpty()
-            .NotNull().WithMessage("Phone Number is required.")
-            .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
-            .MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
-            .Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
+            .NotEmpty();
 
         RuleFor(r => r.Surname)
             .MinimumLength(1);

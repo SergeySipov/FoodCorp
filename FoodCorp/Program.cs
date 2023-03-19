@@ -89,7 +89,7 @@ try
 
     app.MapHealthChecks(AppSettingConstants.HealthCheckMap,
         new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
-    
+
     app.Run();
 
     static Task WriteHealthCheckResponse(HttpContext httpContext, HealthReport result)

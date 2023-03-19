@@ -1,9 +1,12 @@
 ﻿using FoodCorp.API.Mappers.AccountMapper;
 using FoodCorp.API.ViewModels.Account;
 using FoodCorp.BusinessLogic.Services.Account;
+using FoodCorp.BusinessLogic.Services.Email;
+using FoodCorp.Configuration.Model.AppSettings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace FoodCorp.API.Controllers;
 
@@ -11,17 +14,23 @@ public class AccountController : ApiBaseController
 {
     private readonly IAccountService _accountService;
     private readonly IAccountMapper _accountMapper;
+    private readonly IOptions<SecuritySettings> _securityOptions;
+    private readonly IEmailSenderService _emailSenderService;
 
     public AccountController(IAccountService accountService,
-        IAccountMapper accountMapper)
+        IAccountMapper accountMapper, 
+        IOptions<SecuritySettings> securityOptions, 
+        IEmailSenderService emailSenderService)
     {
         _accountService = accountService;
         _accountMapper = accountMapper;
+        _securityOptions = securityOptions;
+        _emailSenderService = emailSenderService;
     }
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> LoginWithFacebook([FromBody] string credential)
+    public async Task<IActionResult> LoginOrRegisterWithFacebook([FromBody] string credential)
     {
         var jwtToken = await _accountService.LoginOrRegisterWithFacebookAsync(credential);
 
@@ -30,7 +39,7 @@ public class AccountController : ApiBaseController
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> LoginWithGoogle(GoogleLoginViewModel loginViewModel)
+    public async Task<IActionResult> LoginOrRegisterWithGoogle(GoogleLoginViewModel loginViewModel)
     {
        var googleLoginModel = _accountMapper.MapTo(loginViewModel);
        var jwtToken = await _accountService.LoginOrRegisterWithGoogleAsync(googleLoginModel);
@@ -53,8 +62,29 @@ public class AccountController : ApiBaseController
     public async Task<IActionResult> Register(RegistrationViewModel registrationViewModel)
     {
         var registrationModel = _accountMapper.MapTo(registrationViewModel);
-        var jwtToken = await _accountService.RegisterAsync(registrationModel);
+        
+        if (_securityOptions.Value.RequireConfirmedEmail)
+        {
+            var emailConfirmationToken = _accountService.RegisterAngGetEmailConfirmationTokenAsync(registrationModel);
 
+            var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account",
+                new { registrationModel.Email, confirmToken = emailConfirmationToken }, Request.Scheme);
+
+            await _emailSenderService.SendEmailAsync(registrationModel.Email, "Confirm your email",
+                $"Чтобы завершить регистрацию - перейдите по <a href='{confirmationLink}'>ссылке</a>");
+
+            return Ok();
+        }
+
+        var jwtToken = await _accountService.RegisterAndGetJwtTokenAsync(registrationModel);
+        return Ok(jwtToken);
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> ConfirmEmail(string email, string confirmToken)
+    {
+        var jwtToken = await _accountService.CompleteEmailConfirmationAsync(email, confirmToken);
         return Ok(jwtToken);
     }
 

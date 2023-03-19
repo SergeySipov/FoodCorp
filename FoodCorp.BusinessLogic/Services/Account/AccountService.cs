@@ -31,7 +31,7 @@ public class AccountService : IAccountService
     public AccountService(UserManager<User> userManager,
         IAccountMapper accountMapper,
         IJwtTokenGenerationService jwtTokenGenerationService,
-        IHttpClientFactory httpClientFactory, 
+        IHttpClientFactory httpClientFactory,
         IOptions<FacebookAuthenticationSettings> facebookAuthSettings)
     {
         _userManager = userManager;
@@ -61,17 +61,17 @@ public class AccountService : IAccountService
         return jwtToken;
     }
 
-    public async Task<string> RegisterAsync(RegistrationModel registrationModel)
+    public async Task<string> RegisterAngGetEmailConfirmationTokenAsync(RegistrationModel registrationModel)
     {
-        var user = _accountMapper.MapTo(registrationModel);
-
-        user.Role = Role.NaturalPerson;
-        user.RegistrationDateTimeUtc = DateTime.UtcNow;
-
-        var identityResult = await _userManager.CreateAsync(user, registrationModel.Password);
-        identityResult.ThrowExceptionOnFailure();
+        var user = await RegisterAsync(registrationModel);
 
         var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        return emailConfirmationToken;
+    }
+
+    public async Task<string> RegisterAndGetJwtTokenAsync(RegistrationModel registrationModel)
+    {
+        var user = await RegisterAsync(registrationModel);
 
         var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
         return jwtToken;
@@ -79,9 +79,8 @@ public class AccountService : IAccountService
 
     public async Task<string> LoginOrRegisterWithGoogleAsync(GoogleLoginModel googleLoginModel)
     {
-        var jwtToken = string.Empty;
-
-        var payload = await GoogleJsonWebSignature.ValidateAsync(googleLoginModel.IdToken, new GoogleJsonWebSignature.ValidationSettings());
+        var payload = await GoogleJsonWebSignature.ValidateAsync(googleLoginModel.IdToken,
+            new GoogleJsonWebSignature.ValidationSettings());
         var user = await _userManager.FindByEmailAsync(payload.Email);
         if (user == null)
         {
@@ -93,22 +92,10 @@ public class AccountService : IAccountService
                 string.Empty,
                 payload.Picture);
 
-            jwtToken = await RegisterAsync(newUser);
-
-            user = await _userManager.FindByEmailAsync(payload.Email);
+            user = await RegisterAsync(newUser, true);
         }
 
-        var identityResult = await _userManager.AddLoginAsync(user, new UserLoginInfo(
-            googleLoginModel.IdentityProviderId,
-            googleLoginModel.ProviderKey,
-            "Google"));
-
-        identityResult.ThrowExceptionOnFailure();
-
-        if (string.IsNullOrEmpty(jwtToken))
-        {
-            jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
-        }
+        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
         return jwtToken;
     }
 
@@ -138,7 +125,6 @@ public class AccountService : IAccountService
             throw new AuthenticationException();
         }
 
-        var jwtToken = string.Empty;
         var user = await _userManager.FindByEmailAsync(facebookUserInfo.Email);
         if (user == null)
         {
@@ -150,22 +136,34 @@ public class AccountService : IAccountService
                 string.Empty,
                 facebookUserInfo.Image.ImageUrl);
 
-            jwtToken = await RegisterAsync(newUser);
-
-            user = await _userManager.FindByEmailAsync(facebookUserInfo.Email);
+            user = await RegisterAsync(newUser, true);
         }
 
-        //var identityResult = await _userManager.AddLoginAsync(user, new UserLoginInfo(
-        //    googleLoginModel.IdentityProviderId,
-        //    googleLoginModel.ProviderKey,
-        //    "Facebook"));
-
-        //identityResult.ThrowExceptionOnFailure();
-
-        if (string.IsNullOrEmpty(jwtToken))
-        {
-            jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
-        }
+        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
         return jwtToken;
+    }
+
+    public async Task<string> CompleteEmailConfirmationAsync(string email, string confirmToken)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        var confirmEmailIdentityResult = await _userManager.ConfirmEmailAsync(user, confirmToken);
+        confirmEmailIdentityResult.ThrowExceptionOnFailure();
+
+        return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
+    }
+
+    private async Task<User> RegisterAsync(RegistrationModel registrationModel, bool isEmailConfirmed = false)
+    {
+        var user = _accountMapper.MapTo(registrationModel);
+
+        user.Role = Role.NaturalPerson;
+        user.RegistrationDateTimeUtc = DateTime.UtcNow;
+        user.EmailConfirmed = isEmailConfirmed;
+
+        var identityResult = await _userManager.CreateAsync(user, registrationModel.Password);
+        identityResult.ThrowExceptionOnFailure();
+
+        return user;
     }
 }

@@ -27,6 +27,7 @@ public static class DataAccessServicesInjectionExtensions
         services.AddIdentityCore<User>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = securitySettings.RequireConfirmedAccount;
+                options.SignIn.RequireConfirmedEmail = securitySettings.RequireConfirmedEmail;
 
                 options.User.RequireUniqueEmail = securitySettings.RequireUniqueEmail;
 

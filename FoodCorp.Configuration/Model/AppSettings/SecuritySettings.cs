@@ -10,4 +10,5 @@ public class SecuritySettings
     public bool RequireUppercase { get; set; }
     public bool RequireLowercase { get; set; }
     public int PasswordHashIterationsCount { get; set; }
+    public bool RequireConfirmedEmail { get; set; }
 }
