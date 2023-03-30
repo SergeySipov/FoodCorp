@@ -14,7 +14,7 @@ public static class DataAccessServicesInjectionExtensions
 {
     public static void AddDatabaseContext(this IServiceCollection services,
         IConfiguration configuration,
-        SecuritySettings securitySettings)
+        IdentitySecuritySettings securitySettings)
     {
         var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
         services.AddDbContext<FoodCorpDbContext>(options =>

@@ -6,4 +6,7 @@ public class SmtpSettings
     public int Port { get; set; }
     public string SenderMail { get; set; }
     public string SenderMailPassword { get; set; }
+    public int SslEnabledPort { get; set; }
+    public bool IsSslEnabled { get; set; }
+    public string RecipientMail { get; set; } 
 }

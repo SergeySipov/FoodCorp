@@ -1,11 +1,12 @@
-﻿using FoodCorp.API.Mappers.AccountMapper;
+﻿using FoodCorp.API.Constants.Resources;
+using FoodCorp.API.Mappers.AccountMapper;
 using FoodCorp.API.ViewModels.Account;
 using FoodCorp.BusinessLogic.Services.Account;
 using FoodCorp.BusinessLogic.Services.Email;
 using FoodCorp.Configuration.Model.AppSettings;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace FoodCorp.API.Controllers;
@@ -14,18 +15,21 @@ public class AccountController : ApiBaseController
 {
     private readonly IAccountService _accountService;
     private readonly IAccountMapper _accountMapper;
-    private readonly IOptions<SecuritySettings> _securityOptions;
+    private readonly IOptions<IdentitySecuritySettings> _identitySecurityOptions;
     private readonly IEmailSenderService _emailSenderService;
+    private readonly IStringLocalizer<AccountController> _stringLocalizer;
 
     public AccountController(IAccountService accountService,
-        IAccountMapper accountMapper, 
-        IOptions<SecuritySettings> securityOptions, 
-        IEmailSenderService emailSenderService)
+        IAccountMapper accountMapper,
+        IOptions<IdentitySecuritySettings> identitySecurityOptions,
+        IEmailSenderService emailSenderService,
+        IStringLocalizer<AccountController> stringLocalizer)
     {
         _accountService = accountService;
         _accountMapper = accountMapper;
-        _securityOptions = securityOptions;
+        _identitySecurityOptions = identitySecurityOptions;
         _emailSenderService = emailSenderService;
+        _stringLocalizer = stringLocalizer;
     }
 
     [AllowAnonymous]
@@ -41,8 +45,8 @@ public class AccountController : ApiBaseController
     [HttpPost]
     public async Task<IActionResult> LoginOrRegisterWithGoogle(GoogleLoginViewModel loginViewModel)
     {
-       var googleLoginModel = _accountMapper.MapTo(loginViewModel);
-       var jwtToken = await _accountService.LoginOrRegisterWithGoogleAsync(googleLoginModel);
+        var googleLoginModel = _accountMapper.MapTo(loginViewModel);
+        var jwtToken = await _accountService.LoginOrRegisterWithGoogleAsync(googleLoginModel);
 
         return Ok(jwtToken);
     }
@@ -62,16 +66,20 @@ public class AccountController : ApiBaseController
     public async Task<IActionResult> Register(RegistrationViewModel registrationViewModel)
     {
         var registrationModel = _accountMapper.MapTo(registrationViewModel);
-        
-        if (_securityOptions.Value.RequireConfirmedEmail)
+
+        if (_identitySecurityOptions.Value.RequireConfirmedEmail)
         {
-            var emailConfirmationToken = _accountService.RegisterAngGetEmailConfirmationTokenAsync(registrationModel);
+            var emailConfirmationToken = await _accountService.RegisterAngGetEmailConfirmationTokenAsync(registrationModel);
 
             var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account",
                 new { registrationModel.Email, confirmToken = emailConfirmationToken }, Request.Scheme);
-
-            await _emailSenderService.SendEmailAsync(registrationModel.Email, "Confirm your email",
-                $"Чтобы завершить регистрацию - перейдите по <a href='{confirmationLink}'>ссылке</a>");
+            
+            var messageSubject = _stringLocalizer[ControllerResourcesKeyConstants.EmailConfirmationSubject];
+            var messageBody = _stringLocalizer[ControllerResourcesKeyConstants.EmailConfirmationMessage];
+            
+            await _emailSenderService.SendEmailAsync(registrationModel.Email, 
+                messageSubject,
+                string.Format(messageBody, confirmationLink));
 
             return Ok();
         }
@@ -86,19 +94,5 @@ public class AccountController : ApiBaseController
     {
         var jwtToken = await _accountService.CompleteEmailConfirmationAsync(email, confirmToken);
         return Ok(jwtToken);
-    }
-
-    [Authorize]
-    [HttpGet]
-    public IActionResult LogOut()
-    {
-        //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-        return new SignOutResult(new[]
-        {
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            //JwtBearerDefaults.AuthenticationScheme,
-            //GoogleDefaults.AuthenticationScheme,
-        });
     }
 }

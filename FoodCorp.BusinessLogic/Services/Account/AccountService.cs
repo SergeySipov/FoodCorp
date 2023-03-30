@@ -1,4 +1,5 @@
 ﻿using System.Security.Authentication;
+using FoodCorp.BusinessLogic.Constants;
 using FoodCorp.BusinessLogic.Extensions;
 using FoodCorp.BusinessLogic.Mappers.AccountMapper;
 using FoodCorp.BusinessLogic.Models.Account;
@@ -16,12 +17,6 @@ namespace FoodCorp.BusinessLogic.Services.Account;
 
 public class AccountService : IAccountService
 {
-    private const string TokenValidationUrl =
-        "https://graph.facebook.com/debug_token?input_token={0}&access_token={1}|{2}";
-
-    private const string UserInfoUrl =
-        "https://graph.facebook.com/me?fields=first_name,last_name,email,id,picture&access_token={0}";
-
     private readonly UserManager<User> _userManager;
     private readonly IAccountMapper _accountMapper;
     private readonly IJwtTokenGenerationService _jwtTokenGenerationService;
@@ -101,9 +96,9 @@ public class AccountService : IAccountService
 
     public async Task<string> LoginOrRegisterWithFacebookAsync(string credentials)
     {
-        var httpClient = _httpClientFactory.CreateClient("FacebookHttpClientConnection");
+        var httpClient = _httpClientFactory.CreateClient(HttpClientConnectionNameConstants.Facebook);
 
-        var formattedTokenValidationUrl = string.Format(TokenValidationUrl, credentials,
+        var formattedTokenValidationUrl = string.Format(AuthenticationUrlConstants.TokenValidationUrl, credentials,
             _facebookAuthSettings.Value.AppId, _facebookAuthSettings.Value.AppSecret);
         var debugTokenResponse = await httpClient.GetAsync(formattedTokenValidationUrl);
 
@@ -115,7 +110,7 @@ public class AccountService : IAccountService
             throw new AuthenticationException();
         }
 
-        var formattedUserInfoUrl = string.Format(UserInfoUrl, credentials);
+        var formattedUserInfoUrl = string.Format(AuthenticationUrlConstants.UserInfoUrl, credentials);
         var meResponse = await httpClient.GetAsync(formattedUserInfoUrl);
         var userContent = await meResponse.Content.ReadAsStringAsync();
         var facebookUserInfo = JsonConvert.DeserializeObject<FacebookUserInfo>(userContent);

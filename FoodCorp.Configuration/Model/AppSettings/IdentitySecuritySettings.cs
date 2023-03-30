@@ -1,6 +1,6 @@
 ﻿namespace FoodCorp.Configuration.Model.AppSettings;
 
-public class SecuritySettings
+public class IdentitySecuritySettings
 {
     public bool RequireConfirmedAccount { get; set; }
     public bool RequireUniqueEmail { get; set; }

@@ -10,6 +10,7 @@ using NLog;
 using NLog.Web;
 using System.Net.Mime;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 
 var logger = NLogBuilder.ConfigureNLog(AppSettingConstants.LoggerConfigurationFileName).GetCurrentClassLogger();
 try
@@ -28,7 +29,7 @@ try
     services.AddEndpointsApiExplorer();
     services.AddSwagger(appVersion);
     services.AddConfigurationProvider();
-    services.AddDatabaseContext(configuration, appSettings.SecuritySettings);
+    services.AddDatabaseContext(configuration, appSettings.IdentitySecuritySettings);
     services.AddDataAccessAbstractions();
     services.AddDemoDataSeed(); //temp solution
     services.AddMapster();
@@ -40,21 +41,25 @@ try
     {
         options.AddPolicy(AppSettingConstants.CorsPolicyName, cfg =>
         {
-            cfg.WithOrigins("http://localhost:3000")
+            cfg.WithOrigins(AppSettingConstants.CorsUrl)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
         });
     });
     services.AddHttpClient();
+    services.AddGlobalizationAndLocalization();
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()
         .AddSqlServer(connectionString!);
 
-    builder.ReplaceLoggingProviderWithNlog();
+    builder.ReplaceLoggingProviderWithNlog(appSettings.SmtpSettings);
 
     var app = builder.Build();
+
+    var serviceProvider = app.Services;
+    var requestLocalizationOptions = serviceProvider.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
 
     // Configure the HTTP request pipeline.
     if (!webHostEnvironment.IsProduction())
@@ -71,6 +76,7 @@ try
     }
 
     app.UseMiddleware<ErrorHandlerMiddleware>();
+    app.UseRequestLocalization(requestLocalizationOptions);
     app.UseHttpsRedirection();
     app.UseRouting();
     app.UseCors(AppSettingConstants.CorsPolicyName);

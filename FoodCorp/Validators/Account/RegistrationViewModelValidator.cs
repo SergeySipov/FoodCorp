@@ -1,13 +1,16 @@
 ﻿using FluentValidation;
+using FoodCorp.API.Constants.Resources;
 using FoodCorp.API.ViewModels.Account;
 using FoodCorp.Configuration.Model.AppSettings;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace FoodCorp.API.Validators.Account;
 
 public class RegistrationViewModelValidator : AbstractValidator<RegistrationViewModel>
 {
-    public RegistrationViewModelValidator(IOptions<SecuritySettings> securitySettings)
+    public RegistrationViewModelValidator(IOptions<IdentitySecuritySettings> securitySettings,
+        IStringLocalizer stringLocalizer)
     {
         RuleFor(r => r.Email)
             .EmailAddress();
@@ -18,12 +21,14 @@ public class RegistrationViewModelValidator : AbstractValidator<RegistrationView
         RuleFor(r => r.Name)
             .MinimumLength(1);
 
-        RuleFor(l => l.Password)
+        RuleFor(r => r.Password)
             .MinimumLength(securitySettings.Value.RequiredLength)
-            .WithMessage($"Password must contains minimum {securitySettings.Value.RequiredLength} symbols");
+            .WithMessage(string.Format(stringLocalizer[ValidatorsResourcesKeyConstants.PasswordLengthError], securitySettings.Value.RequiredLength));
 
         RuleFor(r => r.PhoneNumber)
-            .NotEmpty();
+            .Matches(@"((?:[0-9]\-?){6,14}[0-9]$)|((?:[0-9]\x20?){6,14}[0-9]$)")
+            .NotEmpty()
+            .WithMessage(stringLocalizer[ValidatorsResourcesKeyConstants.PhoneNumberError]);
 
         RuleFor(r => r.Surname)
             .MinimumLength(1);
