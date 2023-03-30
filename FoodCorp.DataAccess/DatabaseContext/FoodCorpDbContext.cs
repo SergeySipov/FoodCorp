@@ -1,12 +1,13 @@
 ﻿using FoodCorp.DataAccess.Entities;
+using FoodCorp.DataAccess.Extensions;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodCorp.DataAccess.DatabaseContext;
 
-public class FoodCorpDbContext : DbContext
+public class FoodCorpDbContext : IdentityUserContext<User, int>
 {
     public DbSet<Role> Roles { get; set; }
-    public DbSet<User> Users { get; set; }
     public DbSet<UserShowcaseImage> UserImages { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
@@ -30,6 +31,8 @@ public class FoodCorpDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FoodCorpDbContext).Assembly);
+        modelBuilder.ConfigureIdentityModels();
     }
 }

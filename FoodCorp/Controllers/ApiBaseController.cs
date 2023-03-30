@@ -2,8 +2,8 @@
 
 namespace FoodCorp.API.Controllers;
 
-[ApiController]
 [Route("api/[controller]/[action]")]
+[ApiController]
 public abstract class ApiBaseController : ControllerBase
 {
 

@@ -28,7 +28,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(u => u.NickName)
+        builder.Property(u => u.UserName)
             .IsRequired()
             .HasMaxLength(256);
 
@@ -52,5 +52,21 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Role)
             .HasColumnName(RoleIdColumnName);
+
+        builder.Property(u => u.PasswordHash)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(u => u.PhoneNumber)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(u => u.SecurityStamp)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(u => u.ConcurrencyStamp)
+            .IsRequired()
+            .HasMaxLength(256);
     }
 }

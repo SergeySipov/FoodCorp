@@ -5,12 +5,12 @@ using FoodCorp.Configuration.Constants;
 using FoodCorp.DataAccess.Seeds;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Web;
 using System.Net.Mime;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 
 var logger = NLogBuilder.ConfigureNLog(AppSettingConstants.LoggerConfigurationFileName).GetCurrentClassLogger();
 try
@@ -24,37 +24,49 @@ try
     var appVersion = ApplicationHelper.GetApplicationVersion();
 
     // Add services to the container.
+    var appSettings = services.AddAppSettingsModels(configuration);
     services.AddControllers();
     services.AddEndpointsApiExplorer();
-    services.AddSwaggerGen(options =>
-    {
-        options.SwaggerDoc(appVersion,
-            new OpenApiInfo
-            {
-                Title = AppSettingConstants.ProjectName,
-                Version = appVersion
-            });
-    });
+    services.AddSwagger(appVersion);
     services.AddConfigurationProvider();
-    services.AddDatabaseContext(configuration);
+    services.AddDatabaseContext(configuration, appSettings.IdentitySecuritySettings);
     services.AddDataAccessAbstractions();
-    services.AddDemoDataSeed();//temp solution
+    services.AddDemoDataSeed(); //temp solution
     services.AddMapster();
     services.AddBusinessLogicServices();
+    services.AddAuthenticationAndAuthorization(appSettings);
+    services.AddPresentationLayerServices();
+    services.AddFluentValidation();
+    services.AddCors(options =>
+    {
+        options.AddPolicy(AppSettingConstants.CorsPolicyName, cfg =>
+        {
+            cfg.WithOrigins(AppSettingConstants.CorsUrl)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+    });
+    services.AddHttpClient();
+    services.AddGlobalizationAndLocalization();
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()
         .AddSqlServer(connectionString!);
 
-    builder.ReplaceLoggingProviderWithNlog();
+    builder.ReplaceLoggingProviderWithNlog(appSettings.SmtpSettings);
 
     var app = builder.Build();
+
+    var serviceProvider = app.Services;
+    var requestLocalizationOptions = serviceProvider.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
 
     // Configure the HTTP request pipeline.
     if (!webHostEnvironment.IsProduction())
     {
         var currentAppVersion = appVersion;
-        var swaggerEndpointWithCurrentVersion = string.Format(AppSettingConstants.SwaggerEndpointUrl, currentAppVersion);
+        var swaggerEndpointWithCurrentVersion =
+            string.Format(AppSettingConstants.SwaggerEndpointUrl, currentAppVersion);
 
         app.UseSwagger();
         app.UseSwaggerUI(option =>
@@ -62,9 +74,13 @@ try
             option.SwaggerEndpoint(swaggerEndpointWithCurrentVersion, AppSettingConstants.ProjectName);
         });
     }
-    
+
     app.UseMiddleware<ErrorHandlerMiddleware>();
+    app.UseRequestLocalization(requestLocalizationOptions);
     app.UseHttpsRedirection();
+    app.UseRouting();
+    app.UseCors(AppSettingConstants.CorsPolicyName);
+    app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
 
@@ -77,7 +93,8 @@ try
         });
     }
 
-    app.MapHealthChecks(AppSettingConstants.HealthCheckMap, new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
+    app.MapHealthChecks(AppSettingConstants.HealthCheckMap,
+        new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
 
     app.Run();
 
@@ -95,7 +112,7 @@ try
         return httpContext.Response.WriteAsync(json.ToString(Formatting.Indented));
     }
 }
-catch(Exception exception)
+catch (Exception exception)
 {
     logger.Error(exception, "Stopped program because of exception");
     throw;

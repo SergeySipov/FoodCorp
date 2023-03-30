@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodCorp.BusinessLogic", "F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodCorp.Common", "FoodCorp.Common\FoodCorp.Common.csproj", "{971BCA61-C918-4C4B-B81F-BAFEF435A293}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCorp.Configuration", "FoodCorp.Configuration\FoodCorp.Configuration.csproj", "{038321AA-9DFC-4BA0-80EB-DEB7E353CAE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoodCorp.Configuration", "FoodCorp.Configuration\FoodCorp.Configuration.csproj", "{038321AA-9DFC-4BA0-80EB-DEB7E353CAE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

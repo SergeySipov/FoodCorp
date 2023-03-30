@@ -10,28 +10,11 @@ namespace FoodCorp.BusinessLogic.Mappers.ProductMapper
     {
         public ProductModel MapTo(ProductDataModel p1)
         {
-            return p1 == null ? null : new ProductModel()
-            {
-                Name = p1.Name,
-                Category = p1.Category,
-                Price = p1.Price,
-                Description = p1.Description
-            };
+            return p1 == null ? null : new ProductModel(p1.Name, p1.Category, p1.Price, p1.Description);
         }
         public ProductModel MapTo(ProductDataModel p2, ProductModel p3)
         {
-            if (p2 == null)
-            {
-                return null;
-            }
-            ProductModel result = p3 ?? new ProductModel();
-            
-            result.Name = p2.Name;
-            result.Category = p2.Category;
-            result.Price = p2.Price;
-            result.Description = p2.Description;
-            return result;
-            
+            return p2 == null ? null : new ProductModel(p2.Name, p2.Category, p2.Price, p2.Description);
         }
         public IEnumerable<ProductModel> MapTo(IEnumerable<ProductDataModel> p4)
         {
@@ -40,13 +23,7 @@ namespace FoodCorp.BusinessLogic.Mappers.ProductMapper
         
         private ProductModel funcMain1(ProductDataModel p5)
         {
-            return p5 == null ? null : new ProductModel()
-            {
-                Name = p5.Name,
-                Category = p5.Category,
-                Price = p5.Price,
-                Description = p5.Description
-            };
+            return p5 == null ? null : new ProductModel(p5.Name, p5.Category, p5.Price, p5.Description);
         }
     }
 }
