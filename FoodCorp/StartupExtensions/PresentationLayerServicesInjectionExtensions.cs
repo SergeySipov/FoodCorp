@@ -45,7 +45,7 @@ public static class PresentationLayerServicesInjectionExtensions
         };
 
         config.AddTarget(target);
-        config.AddRuleForOneLevel(LogLevel.Info, target);
+        config.AddRuleForOneLevel(LogLevel.Error, target);
     }
     
     public static void AddAuthenticationAndAuthorization(this IServiceCollection services,
