@@ -3,6 +3,7 @@ using FoodCorp.Configuration.Model.AppSettings;
 using FoodCorp.DataAccess.DatabaseContext;
 using FoodCorp.DataAccess.Entities;
 using FoodCorp.DataAccess.Repositories.ProductRepository;
+using FoodCorp.DataAccess.Repositories.UserRepository;
 using FoodCorp.DataAccess.Seeds;
 using FoodCorp.DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
@@ -51,6 +52,7 @@ public static class DataAccessServicesInjectionExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
     }
 
     public static void AddDemoDataSeed(this IServiceCollection services)

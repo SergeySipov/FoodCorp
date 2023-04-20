@@ -25,6 +25,8 @@ try
 
     // Add services to the container.
     var appSettings = services.AddAppSettingsModels(configuration);
+
+    services.AddGlobalizationAndLocalization();
     services.AddControllers();
     services.AddEndpointsApiExplorer();
     services.AddSwagger(appVersion);
@@ -48,7 +50,6 @@ try
         });
     });
     services.AddHttpClient();
-    services.AddGlobalizationAndLocalization();
 
     var connectionString = configuration.GetConnectionString(AppSettingConstants.FoodCorpDbConnectionStringName);
     services.AddHealthChecks()
@@ -81,7 +82,7 @@ try
     app.UseRouting();
     app.UseCors(AppSettingConstants.CorsPolicyName);
     app.UseAuthentication();
-    app.UseAuthorization();
+    app.UseMiddleware<RequestsLoggingMiddleware>();
     app.MapControllers();
 
     if (!webHostEnvironment.IsProduction())

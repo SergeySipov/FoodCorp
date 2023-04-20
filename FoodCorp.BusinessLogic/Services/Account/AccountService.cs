@@ -7,6 +7,7 @@ using FoodCorp.BusinessLogic.Models.Account.Facebook;
 using FoodCorp.BusinessLogic.Services.JwtToken;
 using FoodCorp.Configuration.Model.AppSettings;
 using FoodCorp.DataAccess.Entities;
+using FoodCorp.DataAccess.Repositories.UserRepository;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -22,18 +23,21 @@ public class AccountService : IAccountService
     private readonly IJwtTokenGenerationService _jwtTokenGenerationService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptions<FacebookAuthenticationSettings> _facebookAuthSettings;
+    private readonly IUserRepository _userRepository;
 
     public AccountService(UserManager<User> userManager,
         IAccountMapper accountMapper,
         IJwtTokenGenerationService jwtTokenGenerationService,
         IHttpClientFactory httpClientFactory,
-        IOptions<FacebookAuthenticationSettings> facebookAuthSettings)
+        IOptions<FacebookAuthenticationSettings> facebookAuthSettings, 
+        IUserRepository userRepository)
     {
         _userManager = userManager;
         _accountMapper = accountMapper;
         _jwtTokenGenerationService = jwtTokenGenerationService;
         _httpClientFactory = httpClientFactory;
         _facebookAuthSettings = facebookAuthSettings;
+        _userRepository = userRepository;
     }
 
     public async Task<string> LoginUserAsync(LoginModel loginModel)
@@ -52,7 +56,8 @@ public class AccountService : IAccountService
             throw new AuthenticationException(loginModel.Email);
         }
 
-        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
+        var userPermissionsBitMask = await _userRepository.GetUserPermissionsBitMaskAsync(user.Id);
+        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, userPermissionsBitMask);
         return jwtToken;
     }
 
@@ -67,8 +72,10 @@ public class AccountService : IAccountService
     public async Task<string> RegisterAndGetJwtTokenAsync(RegistrationModel registrationModel)
     {
         var user = await RegisterAsync(registrationModel);
+        var userPermissionsBitMask = await _userRepository.GetUserPermissionsBitMaskAsync(user.Id);
 
-        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
+        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, userPermissionsBitMask);
+
         return jwtToken;
     }
 
@@ -76,6 +83,7 @@ public class AccountService : IAccountService
     {
         var payload = await GoogleJsonWebSignature.ValidateAsync(googleLoginModel.IdToken,
             new GoogleJsonWebSignature.ValidationSettings());
+
         var user = await _userManager.FindByEmailAsync(payload.Email);
         if (user == null)
         {
@@ -88,10 +96,11 @@ public class AccountService : IAccountService
                 payload.Picture);
 
             user = await RegisterAsync(newUser, true);
+            return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, 0);
         }
 
-        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
-        return jwtToken;
+        var userPermissionsBitMask = await _userRepository.GetUserPermissionsBitMaskAsync(user.Id);
+        return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, userPermissionsBitMask);
     }
 
     public async Task<string> LoginOrRegisterWithFacebookAsync(string credentials)
@@ -132,10 +141,11 @@ public class AccountService : IAccountService
                 facebookUserInfo.Image.ImageUrl);
 
             user = await RegisterAsync(newUser, true);
+            return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, 0);
         }
 
-        var jwtToken = _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
-        return jwtToken;
+        var userPermissionsBitMask = await _userRepository.GetUserPermissionsBitMaskAsync(user.Id);
+        return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, userPermissionsBitMask);
     }
 
     public async Task<string> CompleteEmailConfirmationAsync(string email, string confirmToken)
@@ -145,7 +155,8 @@ public class AccountService : IAccountService
         var confirmEmailIdentityResult = await _userManager.ConfirmEmailAsync(user, confirmToken);
         confirmEmailIdentityResult.ThrowExceptionOnFailure();
 
-        return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email);
+        var userPermissionsBitMask = await _userRepository.GetUserPermissionsBitMaskAsync(user.Id);
+        return _jwtTokenGenerationService.GenerateJwt(user.Id, user.Email, userPermissionsBitMask);
     }
 
     private async Task<User> RegisterAsync(RegistrationModel registrationModel, bool isEmailConfirmed = false)

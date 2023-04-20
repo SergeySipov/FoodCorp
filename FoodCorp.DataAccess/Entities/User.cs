@@ -13,4 +13,5 @@ public class User : IdentityUser<int>
     public ICollection<UserShowcaseImage> ShowcaseImages { get; set; }
     public Customer Customer { get; set; }
     public Performer Performer { get; set; }
+    public UserPermissions Permissions { get; set; }
 }

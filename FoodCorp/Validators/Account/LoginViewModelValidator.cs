@@ -10,7 +10,7 @@ namespace FoodCorp.API.Validators.Account;
 public class LoginViewModelValidator : AbstractValidator<LoginViewModel>
 {
     public LoginViewModelValidator(IOptions<IdentitySecuritySettings> securitySettings,
-        IStringLocalizer stringLocalizer)
+        IStringLocalizer<LoginViewModelValidator> stringLocalizer)
     {
         RuleFor(l => l.Email)
             .EmailAddress()

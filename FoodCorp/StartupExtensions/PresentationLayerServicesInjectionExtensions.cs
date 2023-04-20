@@ -75,8 +75,6 @@ public static class PresentationLayerServicesInjectionExtensions
                     ValidateLifetime = jwtSettings.ValidateLifetime
                 };
             });
-
-        services.AddAuthorization();
     }
 
     public static void AddPresentationLayerServices(this IServiceCollection services)

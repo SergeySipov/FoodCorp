@@ -2,5 +2,5 @@
 
 public interface IJwtTokenGenerationService
 {
-    string GenerateJwt(int userId, string userEmail);
+    string GenerateJwt(int userId, string userEmail, int userPermissionsBitMask);
 }

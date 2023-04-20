@@ -23,6 +23,7 @@ public class FoodCorpDbContext : IdentityUserContext<User, int>
     public DbSet<OrderOffer> OrderOffers { get; set; }
     public DbSet<OrderOfferChatMessage> OrderOfferChatMessages { get; set; }
     public DbSet<OrderDeliveryAndPaymentType> OrderDeliveryAndPaymentTypes { get; set; }
+    public DbSet<UserPermissions> UserPermissions { get; set; }
 
     public FoodCorpDbContext(DbContextOptions options) : base(options)
     {
