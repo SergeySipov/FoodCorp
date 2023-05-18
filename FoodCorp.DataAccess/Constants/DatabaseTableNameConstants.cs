@@ -23,4 +23,5 @@ public static class DatabaseTableNameConstants
     public const string UserClaim = nameof(UserClaim);
     public const string UserLogin = nameof(UserLogin);
     public const string UserToken = nameof(UserToken);
+    public const string UserPermissions = nameof(UserPermissions);
 }

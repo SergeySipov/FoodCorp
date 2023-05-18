@@ -1,4 +1,5 @@
-﻿using FoodCorp.Configuration.Model.AppSettings;
+﻿using FoodCorp.BusinessLogic.Constants;
+using FoodCorp.Configuration.Model.AppSettings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,14 +17,14 @@ public class JwtTokenGenerationService : IJwtTokenGenerationService
         _jwtSettings = jwtSettings;
     }
 
-    public string GenerateJwt(int userId, string userEmail)
+    public string GenerateJwt(int userId, string userEmail, int userPermissionsBitMask)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.Value.SecretKey);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = CreateClaimsIdentity(userEmail),
+            Subject = CreateClaimsIdentity(userEmail, userPermissionsBitMask),
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.Value.TokenDurationInMinutes),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
@@ -32,7 +33,7 @@ public class JwtTokenGenerationService : IJwtTokenGenerationService
         return tokenHandler.WriteToken(token);
     }
 
-    private ClaimsIdentity CreateClaimsIdentity(string userEmail)
+    private ClaimsIdentity CreateClaimsIdentity(string userEmail, int userPermissionsBitMask)
     {
         var claims = new List<Claim>
         {
@@ -40,6 +41,7 @@ public class JwtTokenGenerationService : IJwtTokenGenerationService
             new(JwtRegisteredClaimNames.Aud, _jwtSettings.Value.ValidAudience),
             new(JwtRegisteredClaimNames.Iss, _jwtSettings.Value.ValidIssuer),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(ClaimConstants.Permissions, userPermissionsBitMask.ToString())
         };
 
         return new ClaimsIdentity(claims);
